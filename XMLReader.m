@@ -2,7 +2,7 @@
 //  XMLReader.m
 //
 //  Created by Troy on 9/18/10.
-//  Copyright 2010 Troy Brant. All rights reserved.
+//  Updated by Antoine Marcadet on 9/23/11.
 //
 
 #import "XMLReader.h"
@@ -13,7 +13,7 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
 @interface XMLReader (Internal)
 
 - (id)initWithError:(NSError **)error;
-- (NSDictionary *)objectWithData:(NSData *)data;
+- (NSDictionary *)objectWithData:(NSData *)data options:(XMLReaderOptions)options;
 
 @end
 
@@ -26,7 +26,7 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
 + (NSDictionary *)dictionaryForXMLData:(NSData *)data error:(NSError **)error
 {
     XMLReader *reader = [[XMLReader alloc] initWithError:error];
-    NSDictionary *rootDictionary = [reader objectWithData:data];
+    NSDictionary *rootDictionary = [reader objectWithData:data options:0];
     [reader release];
     return rootDictionary;
 }
@@ -35,6 +35,20 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
 {
     NSData *data = [string dataUsingEncoding:NSUTF8StringEncoding];
     return [XMLReader dictionaryForXMLData:data error:error];
+}
+
++ (NSDictionary *)dictionaryForXMLData:(NSData *)data options:(XMLReaderOptions)options error:(NSError **)error
+{
+    XMLReader *reader = [[XMLReader alloc] initWithError:error];
+    NSDictionary *rootDictionary = [reader objectWithData:data options:options];
+    [reader release];
+    return rootDictionary;
+}
+
++ (NSDictionary *)dictionaryForXMLString:(NSString *)string options:(XMLReaderOptions)options error:(NSError **)error
+{
+    NSData *data = [string dataUsingEncoding:NSUTF8StringEncoding];
+    return [XMLReader dictionaryForXMLData:data options:options error:error];
 }
 
 #pragma mark -
@@ -56,7 +70,7 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
     [super dealloc];
 }
 
-- (NSDictionary *)objectWithData:(NSData *)data
+- (NSDictionary *)objectWithData:(NSData *)data options:(XMLReaderOptions)options
 {
     // Clear out any old data
     [dictionaryStack release];
@@ -70,6 +84,11 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
     
     // Parse the XML
     NSXMLParser *parser = [[NSXMLParser alloc] initWithData:data];
+    
+    [parser setShouldProcessNamespaces:(options & XMLReaderOptionsProcessNamespaces)];
+    [parser setShouldReportNamespacePrefixes:(options & XMLReaderOptionsReportNamespacePrefixes)];
+    [parser setShouldResolveExternalEntities:(options & XMLReaderOptionsResolveExternalEntities)];
+    
     parser.delegate = self;
     BOOL success = [parser parse];
 	
@@ -85,11 +104,12 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
     return nil;
 }
 
+
 #pragma mark -
 #pragma mark NSXMLParserDelegate methods
 
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict
-{
+{   
     // Get the dictionary for the current level in the stack
     NSMutableDictionary *parentDict = [dictionaryStack lastObject];
 
