@@ -10,7 +10,7 @@
 NSString *const kXMLReaderTextNodeKey		= @"text";
 NSString *const kXMLReaderAttributePrefix	= @"@";
 
-@interface XMLReader (Internal)
+@interface XMLReader ()
 
 - (id)initWithError:(NSError **)error;
 - (NSDictionary *)objectWithData:(NSData *)data options:(XMLReaderOptions)options;
