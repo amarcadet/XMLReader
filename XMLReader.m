@@ -3,6 +3,7 @@
 //
 //  Created by Troy on 9/18/10.
 //  Updated by Antoine Marcadet on 9/23/11.
+//  Updated by Divan Visagie on 2012-08-26
 //
 
 #import "XMLReader.h"
@@ -27,7 +28,7 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
 {
     XMLReader *reader = [[XMLReader alloc] initWithError:error];
     NSDictionary *rootDictionary = [reader objectWithData:data options:0];
-    [reader release];
+   
     return rootDictionary;
 }
 
@@ -41,7 +42,7 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
 {
     XMLReader *reader = [[XMLReader alloc] initWithError:error];
     NSDictionary *rootDictionary = [reader objectWithData:data options:options];
-    [reader release];
+
     return rootDictionary;
 }
 
@@ -58,24 +59,15 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
 {
     if (self = [super init])
     {
-        errorPointer = error;
+        errorPointer = *error;
     }
     return self;
-}
-
-- (void)dealloc
-{
-    [dictionaryStack release];
-    [textInProgress release];
-    [super dealloc];
 }
 
 - (NSDictionary *)objectWithData:(NSData *)data options:(XMLReaderOptions)options
 {
     // Clear out any old data
-    [dictionaryStack release];
-    [textInProgress release];
-    
+        
     dictionaryStack = [[NSMutableArray alloc] init];
     textInProgress = [[NSMutableString alloc] init];
     
@@ -92,8 +84,6 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
     parser.delegate = self;
     BOOL success = [parser parse];
 	
-	[parser release];
-    
     // Return the stack's root dictionary on success
     if (success)
     {
@@ -160,10 +150,10 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
     {
         // trim after concatenating
         NSString *trimmedString = [textInProgress stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        [dictInProgress setObject:[[trimmedString mutableCopy] autorelease] forKey:kXMLReaderTextNodeKey];
+        [dictInProgress setObject:[trimmedString mutableCopy] forKey:kXMLReaderTextNodeKey];
 
         // Reset the text
-        [textInProgress release];
+
         textInProgress = [[NSMutableString alloc] init];
     }
     
@@ -180,7 +170,7 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
 - (void)parser:(NSXMLParser *)parser parseErrorOccurred:(NSError *)parseError
 {
     // Set the error pointer to the parser's error object
-    *errorPointer = parseError;
+    errorPointer = parseError;
 }
 
 @end
