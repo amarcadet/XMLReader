@@ -25,14 +25,12 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
 
 @implementation XMLReader
 
-#pragma mark -
-#pragma mark Public methods
+#pragma mark - Public methods
 
 + (NSDictionary *)dictionaryForXMLData:(NSData *)data error:(NSError **)error
 {
     XMLReader *reader = [[XMLReader alloc] initWithError:error];
     NSDictionary *rootDictionary = [reader objectWithData:data options:0];
-   
     return rootDictionary;
 }
 
@@ -46,7 +44,6 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
 {
     XMLReader *reader = [[XMLReader alloc] initWithError:error];
     NSDictionary *rootDictionary = [reader objectWithData:data options:options];
-
     return rootDictionary;
 }
 
@@ -56,12 +53,13 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
     return [XMLReader dictionaryForXMLData:data options:options error:error];
 }
 
-#pragma mark -
-#pragma mark Parsing
+
+#pragma mark - Parsing
 
 - (id)initWithError:(NSError **)error
 {
-    if (self = [super init])
+	self = [super init];
+    if (self)
     {
         errorPointer = *error;
     }
@@ -99,8 +97,7 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
 }
 
 
-#pragma mark -
-#pragma mark NSXMLParserDelegate methods
+#pragma mark -  NSXMLParserDelegate methods
 
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict
 {   
