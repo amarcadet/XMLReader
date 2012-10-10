@@ -8,6 +8,10 @@
 
 #import "XMLReader.h"
 
+#if !defined(__has_feature) || !__has_feature(objc_arc)
+#error "XMLReader requires ARC support."
+#endif
+
 NSString *const kXMLReaderTextNodeKey		= @"text";
 NSString *const kXMLReaderAttributePrefix	= @"@";
 
