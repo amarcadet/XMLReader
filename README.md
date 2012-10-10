@@ -53,7 +53,7 @@ You have 2 options:
 * Use the branch "[no-objc-arc](https://github.com/amarcadet/XMLReader/tree/no-objc-arc)" that use manual reference counting.
 * **Better choice:** add the "-fobjc-arc" compiler flag on `XMLReader.m` file in your build phases.
 
-#### I have trust issue, I don't want ARC, I prefer MRC, what can I do ?
+#### I have trust issues, I don't want ARC, I prefer MRC, what can I do ?
 
 Well, nobody is perfect but, still, you can use the branch "[no-objc-arc](https://github.com/amarcadet/XMLReader/tree/no-objc-arc)".
 
