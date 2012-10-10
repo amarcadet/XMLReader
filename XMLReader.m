@@ -17,8 +17,9 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
 
 @interface XMLReader ()
 
-- (id)initWithError:(NSError **)error;
-- (NSDictionary *)objectWithData:(NSData *)data options:(XMLReaderOptions)options;
+@property (nonatomic, strong) NSMutableArray *dictionaryStack;
+@property (nonatomic, strong) NSMutableString *textInProgress;
+@property (nonatomic, strong) NSError *errorPointer;
 
 @end
 
@@ -61,7 +62,7 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
 	self = [super init];
     if (self)
     {
-        errorPointer = *error;
+        self.errorPointer = *error;
     }
     return self;
 }
@@ -69,12 +70,11 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
 - (NSDictionary *)objectWithData:(NSData *)data options:(XMLReaderOptions)options
 {
     // Clear out any old data
-        
-    dictionaryStack = [[NSMutableArray alloc] init];
-    textInProgress = [[NSMutableString alloc] init];
+    self.dictionaryStack = [[NSMutableArray alloc] init];
+    self.textInProgress = [[NSMutableString alloc] init];
     
     // Initialize the stack with a fresh dictionary
-    [dictionaryStack addObject:[NSMutableDictionary dictionary]];
+    [self.dictionaryStack addObject:[NSMutableDictionary dictionary]];
     
     // Parse the XML
     NSXMLParser *parser = [[NSXMLParser alloc] initWithData:data];
@@ -89,7 +89,7 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
     // Return the stack's root dictionary on success
     if (success)
     {
-        NSDictionary *resultDict = [dictionaryStack objectAtIndex:0];
+        NSDictionary *resultDict = [self.dictionaryStack objectAtIndex:0];
         return resultDict;
     }
     
@@ -102,7 +102,7 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict
 {   
     // Get the dictionary for the current level in the stack
-    NSMutableDictionary *parentDict = [dictionaryStack lastObject];
+    NSMutableDictionary *parentDict = [self.dictionaryStack lastObject];
 
     // Create the child dictionary for the new element, and initilaize it with the attributes
     NSMutableDictionary *childDict = [NSMutableDictionary dictionary];
@@ -138,40 +138,39 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
     }
     
     // Update the stack
-    [dictionaryStack addObject:childDict];
+    [self.dictionaryStack addObject:childDict];
 }
 
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName
 {
     // Update the parent dict with text info
-    NSMutableDictionary *dictInProgress = [dictionaryStack lastObject];
+    NSMutableDictionary *dictInProgress = [self.dictionaryStack lastObject];
     
     // Set the text property
-    if ([textInProgress length] > 0)
+    if ([self.textInProgress length] > 0)
     {
         // trim after concatenating
-        NSString *trimmedString = [textInProgress stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        NSString *trimmedString = [self.textInProgress stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         [dictInProgress setObject:[trimmedString mutableCopy] forKey:kXMLReaderTextNodeKey];
 
         // Reset the text
-
-        textInProgress = [[NSMutableString alloc] init];
+        self.textInProgress = [[NSMutableString alloc] init];
     }
     
     // Pop the current dict
-    [dictionaryStack removeLastObject];
+    [self.dictionaryStack removeLastObject];
 }
 
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string
 {
     // Build the text value
-	[textInProgress appendString:string];
+    [self.textInProgress appendString:string];
 }
 
 - (void)parser:(NSXMLParser *)parser parseErrorOccurred:(NSError *)parseError
 {
     // Set the error pointer to the parser's error object
-    errorPointer = parseError;
+    self.errorPointer = parseError;
 }
 
 @end
