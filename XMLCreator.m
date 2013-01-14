@@ -1,9 +1,19 @@
+//
+//  XMLCreator.m
+//
+//  Created by Divan Visagie on 2013/01/14.
+//
+
+/* Notice: This is experimental code */
+
+
 #import "XMLCreator.h"
-#import "NSDataAdditions.h"
+
 
 @implementation XMLCreator
 
 -(NSString*)cleanStringForXML:(NSString*)string{
+    
     /*&     &amp;
      <     &lt;
      >     &gt;
@@ -11,6 +21,7 @@
      '     &apos;
      /     &#47;
      */
+    
     if(string == nil || [string isEqualToString:@"(null)"])
         return @"";
     
@@ -26,6 +37,8 @@
     return toReturn;
 }
 
+
+/* Creates xml from object (either of type dictionary or array) */
 +(NSString*)xmlStringFromObject:(id)object{
     NSString *toReturn= @"";
     

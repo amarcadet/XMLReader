@@ -1,6 +1,15 @@
+//
+//  XMLCreator.h
+//
+//  Created by Divan Visagie on 2013/01/14.
+//
+
+/* Notice: This is experimental code */
+
+
 #import <Foundation/Foundation.h>
 
-@interface CSXMLCreator : NSObject
+@interface XMLCreator : NSObject
 
 +(NSString*)xmlStringFromObject:(id)object;
 
