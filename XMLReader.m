@@ -3,7 +3,7 @@
 //
 //  Created by Troy Brant on 9/18/10.
 //  Updated by Antoine Marcadet on 9/23/11.
-//  Updated by Divan Visagie on 2012-08-26
+//  Updated by Divan Visagie on 2012/08/26
 //
 
 #import "XMLReader.h"
