@@ -1,0 +1,14 @@
+# xcode noise
+build/
+xcuserdata/
+
+# old skool
+.svn
+
+# osx noise
+.DS_Store
+
+# vim noise
+*~
+*.swp
+
