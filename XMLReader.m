@@ -30,21 +30,23 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
 
 + (NSDictionary *)dictionaryForXMLData:(NSData *)data error:(NSError **)error
 {
-    XMLReader *reader = [[XMLReader alloc] initWithError:error];
-    NSDictionary *rootDictionary = [reader objectWithData:data options:0];
-    return rootDictionary;
+    return [[self class] dictionaryForXMLData:data options:0 error:error];
 }
 
 + (NSDictionary *)dictionaryForXMLString:(NSString *)string error:(NSError **)error
 {
     NSData *data = [string dataUsingEncoding:NSUTF8StringEncoding];
-    return [XMLReader dictionaryForXMLData:data error:error];
+    return [XMLReader dictionaryForXMLData:data options:0 error:error];
 }
 
 + (NSDictionary *)dictionaryForXMLData:(NSData *)data options:(XMLReaderOptions)options error:(NSError **)error
 {
     XMLReader *reader = [[XMLReader alloc] initWithError:error];
     NSDictionary *rootDictionary = [reader objectWithData:data options:options];
+    if (!rootDictionary && error)
+    {
+        *error = reader.errorPointer;
+    }
     return rootDictionary;
 }
 
@@ -59,10 +61,10 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
 
 - (id)initWithError:(NSError **)error
 {
-	self = [super init];
+    self = [super init];
     if (self)
     {
-        self.errorPointer = *error;
+        self.errorPointer = (error ? *error : nil);
     }
     return self;
 }
