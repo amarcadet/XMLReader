@@ -151,7 +151,9 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
     {
         // trim after concatenating
         NSString *trimmedString = [self.textInProgress stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        [dictInProgress setObject:[trimmedString mutableCopy] forKey:kXMLReaderTextNodeKey];
+        if (!([dictInProgress.allKeys containsObject:kXMLReaderTextNodeKey] && [trimmedString isEqualToString:@""])) {
+            [dictInProgress setObject:[trimmedString mutableCopy] forKey:kXMLReaderTextNodeKey];
+        }
 
         // Reset the text
         self.textInProgress = [[NSMutableString alloc] init];
