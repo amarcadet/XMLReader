@@ -12,9 +12,6 @@
 #error "XMLReader requires ARC support."
 #endif
 
-NSString *const kXMLReaderTextNodeKey		= @"text";
-NSString *const kXMLReaderAttributePrefix	= @"@";
-
 @interface XMLReader ()
 
 @property (nonatomic, strong) NSMutableArray *dictionaryStack;
@@ -143,24 +140,28 @@ NSString *const kXMLReaderAttributePrefix	= @"@";
 
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName
 {
+    // Pop the current dict
+    [self.dictionaryStack removeLastObject];
+ 
     // Update the parent dict with text info
     NSMutableDictionary *dictInProgress = [self.dictionaryStack lastObject];
     
     // Set the text property
-    if ([self.textInProgress length] > 0)
+    NSString *trimmedString = [self.textInProgress stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (trimmedString.length > 0)
     {
         // trim after concatenating
-        NSString *trimmedString = [self.textInProgress stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        [dictInProgress setObject:[trimmedString mutableCopy] forKey:kXMLReaderTextNodeKey];
-
+        NSArray *keys = ((NSMutableDictionary*)dictInProgress[elementName]).allKeys;
+        if (keys.count) {
+            [dictInProgress[elementName] setObject:[trimmedString mutableCopy] forKey:elementName];
+        } else {
+            [dictInProgress setObject:[trimmedString mutableCopy] forKey:elementName];
+        }
         // Reset the text
         self.textInProgress = [[NSMutableString alloc] init];
     }
-    
-    // Pop the current dict
-    [self.dictionaryStack removeLastObject];
 }
-
+             
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string
 {
     // Build the text value
