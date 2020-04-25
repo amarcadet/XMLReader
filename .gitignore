@@ -1,6 +1,7 @@
 # xcode noise
 build/
 xcuserdata/
+xcshareddata/
 
 # old skool
 .svn
@@ -11,4 +12,6 @@ xcuserdata/
 # vim noise
 *~
 *.swp
+
+
 
